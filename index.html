@@ -103,7 +103,7 @@
             display: inline-block;
         }
         .download-button:hover {
-            background-color: #45a049;
+            background-color: #107293;
         }
     </style>
 </head>
@@ -159,6 +159,16 @@
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             filteredApps = type === 'all' ? allApps : allApps.filter(app => app.type === type);
 
+            // Atualizar a cor dos botões de filtro
+            document.querySelectorAll('.filter-bar button').forEach(button => button.classList.remove('active'));
+            if (type === 'all') {
+                document.getElementById('filter-all').classList.add('active');
+            } else if (type === 1) {
+                document.getElementById('filter-apps').classList.add('active');
+            } else if (type === 2) {
+                document.getElementById('filter-games').classList.add('active');
+            }
+
             // Filtrar também pelo termo de busca
             filteredApps = filteredApps.filter(app => app.name.toLowerCase().includes(searchTerm));
 
@@ -189,11 +199,22 @@
                     <p><strong>Version:</strong> ${app.version} (${new Date(app.versionDate).toLocaleDateString()})</p>
                     <p><strong>Size:</strong> ${(app.size / 1024 / 1024).toFixed(2)} MB</p>
                     <p>${app.localizedDescription}</p>
-                    <a class="download-button" href="${app.downloadURL}" download>Download</a>
+                    <button class="download-button" onclick="handleDownload(this, '${app.downloadURL}')">Download</button>
                 `;
 
                 container.appendChild(appElement);
             });
+        }
+
+        function handleDownload(button, url) {
+            button.textContent = "Starting Download...";
+            button.disabled = true;
+
+            setTimeout(() => {
+                window.location.href = url;
+                button.textContent = "Download";
+                button.disabled = false;
+            }, 1000); // Simulação de um pequeno atraso para indicar o início do download
         }
 
         const urls = [
