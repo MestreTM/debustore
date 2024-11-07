@@ -21,6 +21,10 @@
         header h1 {
             margin: 0;
             font-size: 2em;
+	    }
+        header h2 {
+            margin: 0;
+            font-size: 1em;
         }
         header .social-links {
             margin-top: 10px;
@@ -89,7 +93,7 @@
             background-color: #5a5a5a;
         }
         .download-button {
-            background-color: #4CAF50;
+            background-color: #0099cc;
             color: #ffffff;
             border: none;
             padding: 10px 15px;
@@ -106,6 +110,7 @@
 <body>
     <header>
         <h1>DebuStore</h1>
+		<h2>IOS IPA REPOSITORY.</h2>
         <div class="social-links">
             <a href="https://twitter.com" target="_blank">Twitter</a>
             <a href="https://facebook.com" target="_blank">Facebook</a>
@@ -114,11 +119,11 @@
     </header>
 
     <div class="search-bar">
-        <input type="text" id="search-input" placeholder="Buscar aplicativos..." oninput="searchApps()">
+        <input type="text" id="search-input" placeholder="Search Apps..." oninput="searchApps()">
     </div>
 
     <div class="filter-bar">
-        <button id="filter-all" onclick="filterApps('all')" class="active">Todos</button>
+        <button id="filter-all" onclick="filterApps('all')" class="active">All</button>
         <button id="filter-apps" onclick="filterApps(1)">Apps</button>
         <button id="filter-games" onclick="filterApps(2)">Games</button>
     </div>
