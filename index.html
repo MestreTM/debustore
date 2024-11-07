@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible=IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Store</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #1f1f1f;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        header .social-links {
+            margin-top: 10px;
+        }
+        header .social-links a {
+            margin: 0 10px;
+            color: #ffffff;
+            text-decoration: none;
+        }
+        .search-bar {
+            margin: 20px auto;
+            text-align: center;
+        }
+        .search-bar input {
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #2a2a2a;
+            color: #ffffff;
+            outline: none;
+        }
+        .app-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 10px;
+        }
+        .app {
+            background-color: #2a2a2a;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            width: 90%;
+            max-width: 300px;
+            text-align: center;
+        }
+        .app img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .app h2 {
+            font-size: 1.3em;
+            margin: 10px 0;
+        }
+        .filter-bar {
+            margin: 20px;
+            text-align: center;
+        }
+        .filter-bar button {
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #3a3a3a;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .filter-bar button.active {
+            background-color: #5a5a5a;
+        }
+        .filter-bar button:hover {
+            background-color: #5a5a5a;
+        }
+        .download-button {
+            background-color: #4CAF50;
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        .download-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>DebuStore</h1>
+        <div class="social-links">
+            <a href="https://twitter.com" target="_blank">Twitter</a>
+            <a href="https://facebook.com" target="_blank">Facebook</a>
+            <a href="https://sign.ipasign.cc" target="_blank">IPA Sign</a>
+        </div>
+    </header>
+
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Buscar aplicativos..." oninput="searchApps()">
+    </div>
+
+    <div class="filter-bar">
+        <button id="filter-all" onclick="filterApps('all')" class="active">Todos</button>
+        <button id="filter-apps" onclick="filterApps(1)">Apps</button>
+        <button id="filter-games" onclick="filterApps(2)">Games</button>
+    </div>
+
+    <div id="app-container" class="app-container"></div>
+
+    <script>
+        let allApps = [];
+        let filteredApps = [];
+
+        async function fetchAppsFromUrls(urls) {
+            try {
+                for (let url of urls) {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    allApps = allApps.concat(data.apps.map(app => ({
+                        ...app,
+                        type: app.type || 1 // Assume tipo 1 (apps) se não especificado
+                    })));
+                }
+
+                // Ordenar apps pela data de versão
+                allApps.sort((a, b) => new Date(b.versionDate) - new Date(a.versionDate));
+                
+                // Ativar filtro 'Todos' por padrão
+                filterApps('all');
+            } catch (error) {
+                console.error('Error fetching apps:', error);
+            }
+        }
+
+        function filterApps(type) {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            filteredApps = type === 'all' ? allApps : allApps.filter(app => app.type === type);
+
+            // Filtrar também pelo termo de busca
+            filteredApps = filteredApps.filter(app => app.name.toLowerCase().includes(searchTerm));
+
+            displayApps();
+        }
+
+        function searchApps() {
+            filterApps('all'); // Refiltrar a partir de todos os apps com base no termo de busca
+        }
+
+        function displayApps() {
+            const container = document.getElementById('app-container');
+            container.innerHTML = '';
+
+            if (filteredApps.length === 0) {
+                container.innerHTML = '<p>Nenhum resultado encontrado.</p>';
+                return;
+            }
+
+            filteredApps.forEach(app => {
+                const appElement = document.createElement('div');
+                appElement.classList.add('app');
+
+                appElement.innerHTML = `
+                    <img src="${app.iconURL}" alt="${app.name} Icon" onerror="this.onerror=null; this.src='https://i.imgur.com/fbInzNl.png';">
+                    <h2>${app.name}</h2>
+                    <p><strong>Developer:</strong> ${app.developerName}</p>
+                    <p><strong>Version:</strong> ${app.version} (${new Date(app.versionDate).toLocaleDateString()})</p>
+                    <p><strong>Size:</strong> ${(app.size / 1024 / 1024).toFixed(2)} MB</p>
+                    <p>${app.localizedDescription}</p>
+                    <button class="download-button" onclick="startDownload('${app.downloadURL}', '${app.name}')">Download</button>
+                `;
+
+                container.appendChild(appElement);
+            });
+        }
+
+        async function startDownload(url, appName) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const downloadUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = `${appName}.apk`; // Ajuste o nome do arquivo conforme necessário
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(downloadUrl);
+            } catch (error) {
+                console.error('Download failed:', error);
+                alert('Erro ao baixar o arquivo.');
+            }
+        }
+
+        const urls = [
+            'https://raw.githubusercontent.com/apptesters-org/Repo/refs/heads/main/apps.json',
+            'https://apps.nabzclan.vip/repos/esign.php'
+            // Adicione outras URLs aqui
+        ];
+
+        // Carregar apps na inicialização
+        window.onload = () => {
+            fetchAppsFromUrls(urls);
+        };
+    </script>
+</body>
+</html>
