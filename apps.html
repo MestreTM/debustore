@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible=IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merged JSON Output</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 20px;
+        }
+        pre {
+            background-color: #1f1f1f;
+            padding: 15px;
+            border-radius: 5px;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <pre id="output"></pre>
+
+    <script>
+        async function fetchJSON(url) {
+            try {
+                const response = await fetch(url);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching JSON:', error);
+                return { apps: [] };
+            }
+        }
+
+        async function displayMergedJSON() {
+            const url1 = 'https://raw.githubusercontent.com/apptesters-org/Repo/refs/heads/main/apps.json'; // URL 1
+            const url2 = 'https://apps.nabzclan.vip/repos/esign.php'; // URL 2
+
+            const json1 = await fetchJSON(url1);
+            const json2 = await fetchJSON(url2);
+
+            // Merge logic: unir arrays de 'apps' de ambos JSONs
+            const mergedApps = [...(json1.apps || []), ...(json2.apps || [])];
+
+            // Criar o objeto resultante na estrutura desejada
+            const mergedJSON = {
+                "$schema": "./altstore.schema.json",
+                "name": "RandomSource",
+                "identifier": "com.randomblock1.randomsource",
+                "sourceURL": "https://randomblock1.github.io/randomsource/apps.json",
+                "apps": mergedApps,
+                "news": [
+                    {
+                        "caption": "Provenance has been removed, because it has its own source.\nAdd it here: https://wiki.provenance-emu.com/installation-and-usage/installing-provenance/sideloading#altstore",
+                        "date": "2022-01-25",
+                        "identifier": "randomsource-provenance",
+                        "notify": true,
+                        "tintColor": "3B878D",
+                        "title": "Provenance Removed"
+                    },
+                    {
+                        "caption": "RandomSource is back! Here is are the apps that have been updated and confirmed to work as of 5/15/21:\n\n* Unc0ver\n* Chimera\n* Rewound\n* YouTube Reborn\n* Kodi\n* RetroArch\n* PPSSPP\n* Instagram++",
+                        "date": "2021-03-05",
+                        "identifier": "randomsource-status",
+                        "notify": true,
+                        "tintColor": "3B878D",
+                        "title": "RandomSource Status"
+                    },
+                    {
+                        "caption": "Randomblock1.com has been acquired. Please update your sources to https://randomblock1.com/altstore. Randomblock1.rocks no longer works, and if you continue using randomsource.imfast.io it may stop working.",
+                        "date": "2020-09-19",
+                        "identifier": "randomsource-randomblock1com",
+                        "notify": false,
+                        "tintColor": "3B878D",
+                        "title": "IMPORTANT MESSAGE"
+                    },
+                    {
+                        "caption": "Great! Everything seems to be in working order, and you can now access RandomSource apps.",
+                        "date": "2020-03-29",
+                        "identifier": "randomsource-loaded",
+                        "imageURL": "https://avatars0.githubusercontent.com/u/19873803?s=460&u=93e7dc8b5ffcf5592a8fbf35b01cc1ae6edd5d39&v=4",
+                        "notify": false,
+                        "tintColor": "3B878D",
+                        "title": "RandomSource has Loaded"
+                    }
+                ]
+            };
+
+            // Exibir o JSON mesclado em formato 'raw'
+            document.getElementById('output').textContent = JSON.stringify(mergedJSON, null, 2);
+        }
+
+        // Chamar a função ao carregar a página
+        displayMergedJSON();
+    </script>
+</body>
+</html>
