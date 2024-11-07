@@ -21,7 +21,7 @@
         header h1 {
             margin: 0;
             font-size: 2em;
-	    }
+        }
         header h2 {
             margin: 0;
             font-size: 1em;
@@ -110,7 +110,7 @@
 <body>
     <header>
         <h1>DebuStore</h1>
-		<h2>IOS IPA REPOSITORY.</h2>
+        <h2>IOS IPA REPOSITORY.</h2>
         <div class="social-links">
             <a href="https://twitter.com" target="_blank">Twitter</a>
             <a href="https://facebook.com" target="_blank">Facebook</a>
@@ -174,7 +174,7 @@
             container.innerHTML = '';
 
             if (filteredApps.length === 0) {
-                container.innerHTML = '<p>Nenhum resultado encontrado.</p>';
+                container.innerHTML = '<p>No results found.</p>';
                 return;
             }
 
@@ -189,29 +189,11 @@
                     <p><strong>Version:</strong> ${app.version} (${new Date(app.versionDate).toLocaleDateString()})</p>
                     <p><strong>Size:</strong> ${(app.size / 1024 / 1024).toFixed(2)} MB</p>
                     <p>${app.localizedDescription}</p>
-                    <button class="download-button" onclick="startDownload('${app.downloadURL}', '${app.name}')">Download</button>
+                    <a class="download-button" href="${app.downloadURL}" download>Download</a>
                 `;
 
                 container.appendChild(appElement);
             });
-        }
-
-        async function startDownload(url, appName) {
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const downloadUrl = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = downloadUrl;
-                a.download = `${appName}.apk`; // Ajuste o nome do arquivo conforme necessário
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                URL.revokeObjectURL(downloadUrl);
-            } catch (error) {
-                console.error('Download failed:', error);
-                alert('Erro ao baixar o arquivo.');
-            }
         }
 
         const urls = [
