@@ -5,10 +5,11 @@
     <meta http-equiv="X-UA-Compatible=IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App Store</title>
-    <link rel="apple-touch-icon" href="icon.png"> <!-- Caminho para o ícone do app -->
+    <link rel="apple-touch-icon" href="icon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DebuStore">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             background-color: #121212;
@@ -17,38 +18,65 @@
             margin: 0;
             padding: 0;
         }
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #121212;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 1s ease;
+        }
+        #splash-screen img {
+            width: 200px;
+            margin-bottom: 20px;
+        }
+        .loading-spinner {
+            border: 4px solid #3a3a3a;
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         header {
             background-color: #1f1f1f;
-            padding: 20px;
+            padding: 15px 10px;
             text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
         }
         header h1 {
             margin: 0;
-            font-size: 2em;
-        }
-        header h2 {
-            margin: 0;
-            font-size: 1em;
-        }
-        header .social-links {
-            margin-top: 10px;
-        }
-        header .social-links a {
-            margin: 0 10px;
-            color: #ffffff;
-            text-decoration: none;
-        }
-        .search-bar {
-            margin: 20px auto;
+            font-size: 1.5em;
+            flex-grow: 1;
             text-align: center;
         }
-        .search-bar input {
-            padding: 10px;
-            width: 80%;
-            max-width: 400px;
-            border-radius: 5px;
-            border: 1px solid #555;
+        .search-bar {
+            margin: 15px;
+            text-align: center;
+            border-radius: 12px;
             background-color: #2a2a2a;
+            padding: 10px;
+        }
+        .search-bar input {
+            padding: 8px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            border: none;
+            background-color: #121212;
             color: #ffffff;
             outline: none;
         }
@@ -67,88 +95,140 @@
             flex-wrap: wrap;
             justify-content: center;
             padding: 10px;
+            gap: 15px;
         }
         .app {
             background-color: #2a2a2a;
-            border-radius: 10px;
+            border-radius: 20px;
             padding: 15px;
-            margin: 10px;
             width: 90%;
             max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         .app img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
+            width: 100px;
+            height: 100px;
+            border-radius: 15px;
             margin-bottom: 10px;
+            object-fit: cover;
         }
         .app h2 {
-            font-size: 1.3em;
+            font-size: 1.2em;
             margin: 10px 0;
         }
-        .filter-bar {
-            margin: 20px;
-            text-align: center;
-        }
-        .filter-bar button {
-            margin: 5px;
-            padding: 10px 20px;
-            background-color: #3a3a3a;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .filter-bar button.active {
-            background-color: #5a5a5a;
-        }
-        .filter-bar button:hover {
-            background-color: #5a5a5a;
+        .app p {
+            font-size: 0.9em;
+            margin: 5px 0;
         }
         .download-button {
             background-color: #0099cc;
             color: #ffffff;
             border: none;
             padding: 10px 15px;
-            border-radius: 5px;
+            border-radius: 20px;
             cursor: pointer;
             margin-top: 10px;
-            display: inline-block;
+            width: 80%;
         }
         .download-button:hover {
             background-color: #107293;
         }
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #1f1f1f;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid #333;
+        }
+        .bottom-nav a,
+        .bottom-nav button {
+            background: none;
+            border: none;
+            color: #bbbbbb;
+            text-align: center;
+            flex: 1;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .bottom-nav a {
+            text-decoration: none;
+        }
+        .bottom-nav button:hover,
+        .bottom-nav a:hover {
+            color: #ffffff;
+        }
+        .bottom-nav-icon {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.5em;
+        }
+        @media screen and (max-width: 768px) {
+            .bottom-nav {
+                display: flex;
+            }
+        }
     </style>
 </head>
 <body>
+    <div id="splash-screen">
+        <img src="https://i.imgur.com/klx134u.png" alt="Logo">
+        <div class="loading-spinner"></div>
+    </div>
+
     <header>
         <h1>DebuStore</h1>
-        <h2>IOS IPA REPOSITORY.</h2>
-        <div class="social-links">
-            <a href="https://twitter.com" target="_blank">Twitter</a>
-            <a href="https://facebook.com" target="_blank">Facebook</a>
-            <a href="https://sign.ipasign.cc" target="_blank">IPA Sign</a>
-        </div>
     </header>
 
     <div class="search-bar">
-        <input type="text" id="search-input" placeholder="Search Apps..." oninput="searchApps()">
+        <input type="text" id="search-input" placeholder="Search by app name" oninput="searchApps()">
     </div>
 
     <div class="app-count" id="app-count">Total apps loaded: 0</div>
-
-    <div class="filter-bar">
-        <button id="filter-all" onclick="filterApps('all')" class="active">All</button>
-        <button id="filter-apps" onclick="filterApps(1)">Apps</button>
-        <button id="filter-games" onclick="filterApps(2)">Games</button>
-    </div>
 
     <div class="loading" id="loading" style="display: none;">Loading apps...</div>
 
     <div id="app-container" class="app-container"></div>
 
+    <div class="bottom-nav">
+        <button onclick="filterApps('all')">
+            <i class="fas fa-th-large bottom-nav-icon"></i>
+            All
+        </button>
+        <button onclick="filterApps(1)">
+            <i class="fas fa-mobile-alt bottom-nav-icon"></i>
+            Apps
+        </button>
+        <button onclick="filterApps(2)">
+            <i class="fas fa-gamepad bottom-nav-icon"></i>
+            Games
+        </button>
+        <a href="https://sign.ipasign.cc" target="_blank">
+            <i class="fas fa-signature bottom-nav-icon"></i>
+            Signer
+        </a>
+    </div>
+
     <script>
+        window.onload = () => {
+            const splashScreen = document.getElementById('splash-screen');
+            setTimeout(() => {
+                splashScreen.style.opacity = '0';
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                }, 1000);
+            }, 3000);
+
+            fetchAppsFromUrls();
+        };
+
         let allApps = [];
         let filteredApps = [];
 
@@ -184,15 +264,6 @@
         function filterApps(type) {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             filteredApps = type === 'all' ? allApps : allApps.filter(app => app.type === type);
-            document.querySelectorAll('.filter-bar button').forEach(button => button.classList.remove('active'));
-            if (type === 'all') {
-                document.getElementById('filter-all').classList.add('active');
-            } else if (type === 1) {
-                document.getElementById('filter-apps').classList.add('active');
-            } else if (type === 2) {
-                document.getElementById('filter-games').classList.add('active');
-            }
-            filteredApps = filteredApps.filter(app => app.name.toLowerCase().includes(searchTerm));
             displayApps();
         }
 
@@ -235,10 +306,6 @@
                 button.disabled = false;
             }, 1000);
         }
-
-        window.onload = () => {
-            fetchAppsFromUrls();
-        };
     </script>
 </body>
 </html>
