@@ -324,7 +324,7 @@
                 const appElement = document.createElement('div');
                 appElement.classList.add('app');
                 appElement.innerHTML = `
-                    <img src="${app.iconURL}" alt="${app.name} Icon" onerror="this.onerror=null; this.src='icon.png';">
+                    <img src="${app.iconURL}" alt="${app.name} Icon" onerror="this.onerror=null; this.src='nothing.png';">
                     <h2>${app.name}</h2>
                     <p><strong>Developer:</strong> ${app.developerName}</p>
                     <p><strong>Version:</strong> ${app.version} (${new Date(app.versionDate).toLocaleDateString()})</p>
@@ -364,6 +364,21 @@
                 button.disabled = false;
             }, 1000);
         }
+		function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        displayApps();
+        window.scrollTo(0, 0); // Vai para o topo da página
+    }
+}
+
+function nextPage() {
+    if ((currentPage * appsPerPage) < filteredApps.length) {
+        currentPage++;
+        displayApps();
+        window.scrollTo(0, 0); // Vai para o topo da página
+    }
+}
     </script>
 </body>
 </html>
