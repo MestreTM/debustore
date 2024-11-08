@@ -145,7 +145,7 @@
             background-color: #1f1f1f;
             display: flex;
             justify-content: space-around;
-            padding: 30px 0;
+            padding: 25px 0;
             border-top: 1px solid #333;
             z-index: 100;
         }
@@ -170,6 +170,23 @@
             display: block;
             margin-bottom: 5px;
             font-size: 1.5em;
+        }
+        .pagination {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .pagination button {
+            margin: 5px;
+            padding: 10px 20px;
+            background-color: #3a3a3a;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .pagination button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
         }
         @media screen and (max-width: 768px) {
             .bottom-nav {
@@ -197,6 +214,11 @@
     <div class="loading" id="loading" style="display: none;">Loading apps...</div>
 
     <div id="app-container" class="app-container"></div>
+
+    <div class="pagination" id="pagination">
+        <button onclick="prevPage()" id="prev-page" disabled>Previous</button>
+        <button onclick="nextPage()" id="next-page" disabled>Next</button>
+    </div>
 
     <div class="bottom-nav">
         <button onclick="filterApps('all')">
@@ -232,6 +254,8 @@
 
         let allApps = [];
         let filteredApps = [];
+        let currentPage = 1;
+        const appsPerPage = 25;
 
         function decodeBase64(encodedStr) {
             return atob(encodedStr);
@@ -265,6 +289,8 @@
         function filterApps(type) {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             filteredApps = type === 'all' ? allApps : allApps.filter(app => app.type === type);
+            filteredApps = filteredApps.filter(app => app.name.toLowerCase().includes(searchTerm));
+            currentPage = 1;
             displayApps();
         }
 
@@ -276,12 +302,20 @@
             const container = document.getElementById('app-container');
             const appCountElement = document.getElementById('app-count');
             container.innerHTML = '';
-            if (filteredApps.length === 0) {
+
+            const start = (currentPage - 1) * appsPerPage;
+            const end = start + appsPerPage;
+            const appsToShow = filteredApps.slice(start, end);
+
+            if (appsToShow.length === 0) {
                 container.innerHTML = '<p>No results found.</p>';
                 appCountElement.textContent = 'Total apps loaded: 0';
+                document.getElementById('prev-page').disabled = true;
+                document.getElementById('next-page').disabled = true;
                 return;
             }
-            filteredApps.forEach(app => {
+
+            appsToShow.forEach(app => {
                 const appElement = document.createElement('div');
                 appElement.classList.add('app');
                 appElement.innerHTML = `
@@ -295,7 +329,25 @@
                 `;
                 container.appendChild(appElement);
             });
+
             appCountElement.textContent = `Total apps loaded: ${filteredApps.length}`;
+
+            document.getElementById('prev-page').disabled = currentPage === 1;
+            document.getElementById('next-page').disabled = end >= filteredApps.length;
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                displayApps();
+            }
+        }
+
+        function nextPage() {
+            if ((currentPage * appsPerPage) < filteredApps.length) {
+                currentPage++;
+                displayApps();
+            }
         }
 
         function handleDownload(button, url) {
